@@ -1,9 +1,5 @@
 package main
 
-import (
-	"fmt"
-)
-
 var txt = `008090000
 070000280
 064100309
@@ -36,38 +32,28 @@ func in(b byte, line []byte) bool {
 	return false
 }
 
-func scan(su *sudo) bool {
+func scan(su *sudo) int {
 	for i := 0; i < 9; i++ {
 		for j := 0; j < 9; j++ {
 			if !su[i][j].IsOk() {
 				if len(su[i][j].Maybe()) == 1 {
 					su[i][j].num = su[i][j].Maybe()[0]
 					if su.IsOk() {
-						su.Reader()
-						return true
+						return 1
 					}
 					scan(su)
+				} else if len(su[i][j].Maybe()) == 0 {
+					return -1
 				}
 			}
 		}
 	}
-	return false
+	return 0
 }
 
 
 func main() {
 	sudo001 := makeSudo(txt)
-	sudo001.Reader()
-	fmt.Println()
-	scan(&sudo001)
-
-	next := sudo001.Gen()
-	for {
-		if result, err := next(); err == nil {
-			fmt.Println(result)
-		} else {
-			fmt.Println(err)
-			break
-		}
-	}
+	sulist := stack{{su:sudo001, seq:-1}}
+	sulist.deepScan()
 }

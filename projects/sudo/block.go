@@ -16,11 +16,11 @@ func initBlock(num byte, row, col int, su *sudo) block {
 	return b
 }
 
-func (b block) IsOk() bool {
+func (b block)IsOk() bool {
 	return b.num != '0'
 }
 
-func (b block) GetRow() []byte {
+func (b block)GetRow() []byte {
 	var row []byte
 	for i := 0; i < 9; i++ {
 		row = append(row, b.owner[b.row][i].num)
@@ -28,7 +28,7 @@ func (b block) GetRow() []byte {
 	return row
 }
 
-func (b block) GetCol() []byte {
+func (b block)GetCol() []byte {
 	var col []byte
 	for i := 0; i < 9; i++ {
 		col = append(col, b.owner[i][b.col].num)
@@ -36,7 +36,7 @@ func (b block) GetCol() []byte {
 	return col
 }
 
-func (b block) GetTup() []byte {
+func (b block)GetTup() []byte {
 	var result []byte
 	baseRow := b.row / 3 * 3
 	baseCol := b.col / 3 * 3
@@ -48,11 +48,25 @@ func (b block) GetTup() []byte {
 	return result
 }
 
-func (b block) Maybe() []byte {
+func lineOk(blist []byte) bool {
+	result := make(map[byte]int)
+	for _, b := range blist {
+		result[b]++
+		if result[b] > 1 {
+			return false
+		}
+	}
+	return true
+}
+
+func (b block)Maybe() []byte {
 	if b.IsOk() {
 		return []byte{b.num}
 	}
 	var result []byte
+	if !lineOk(b.GetRow()) || !lineOk(b.GetCol()) || !lineOk(b.GetTup()) {
+		return result
+	}
 	for i := byte('1'); i <= '9'; i++ {
 		if !in(i, b.GetRow()) && !in(i, b.GetCol()) && !in(i, b.GetTup()) {
 			result = append(result, i)

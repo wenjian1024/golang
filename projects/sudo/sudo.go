@@ -2,13 +2,12 @@ package main
 
 import (
 	"fmt"
-	"errors"
 )
 
 
 type sudo [9][9]block
 
-func (su sudo) Reader() {
+func (su sudo)Reader() {
 	for i := 0; i < 9; i++ {
 		var line []string
 		for j := 0; j < 9; j++ {
@@ -18,7 +17,7 @@ func (su sudo) Reader() {
 	}
 }
 
-func (su *sudo) IsOk() bool {
+func (su *sudo)IsOk() bool {
 	for i := 0; i < 9; i++ {
 		for j := 0; j < 9; j++ {
 			if !su[i][j].IsOk() {
@@ -29,38 +28,30 @@ func (su *sudo) IsOk() bool {
 	return true
 }
 
-func (su *sudo) Gen() func() (block, error) {
-	r, c := 0, 0
-	for {
-		return func() (block, error) {
-			if c == 9 {
-				return block{num:47}, errors.New("OVER")
-			}
-			fmt.Println(r, c)
-			result := su[r][c]
-			if c == 8 && r < 8 {
-				r += 1
-				c = 0
-			}
-			c += 1
-			return result, nil
-		}
-	}
-}
-
-func (su *sudo) Catch() func() block {
-	temp := su.Gen()
-	return func() block {
-		for i := 2; i < 10; i++ {
-			for {
-				cat, _ := temp()
-				if cat.num == 47 {
-					break
-				} else {
-					if len(cat.Maybe()) == i {return cat}
+func (su *sudo)Locate() *block {
+	for i:=2; i<10; i++ {
+		for r:=0; r<9; r++ {
+			for c:=0; c<9; c++{
+				if len((*su)[r][c].Maybe()) == i{
+					return &(*su)[r][c]
 				}
 			}
 		}
-		return block{num:47}
 	}
+	return &block{row:-1, col:-1}
+}
+
+func (su *sudo)Copy() sudo {
+	var newSu sudo
+	for r:=0; r<9; r++{
+		for c:=0; c<9; c++{
+			var blk block
+			blk.num = (*su)[r][c].num
+			blk.row = r
+			blk.col = c
+			blk.owner = &newSu
+			newSu[r][c] = blk
+		}
+	}
+	return newSu
 }
