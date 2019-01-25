@@ -1,5 +1,7 @@
 package main
 
+import "fmt"
+
 var txt = `008090000
 070000280
 064100309
@@ -39,7 +41,7 @@ func scan(su *sudo) int {
 				if len(su[i][j].Maybe()) == 1 {
 					su[i][j].num = su[i][j].Maybe()[0]
 					if su.IsOk() {
-						return 1
+						return 0
 					}
 					scan(su)
 				} else if len(su[i][j].Maybe()) == 0 {
@@ -48,12 +50,22 @@ func scan(su *sudo) int {
 			}
 		}
 	}
-	return 0
+	return 1
 }
 
+func initNode() node {
+	var top node
+	var node2 node
+	node2.pre = &top
+	node2.floor = 0
+	node2.offset = 0
+	return node2
+}
 
 func main() {
 	sudo001 := makeSudo(txt)
-	sulist := stack{{su:sudo001, seq:-1}}
-	sulist.deepScan()
+	maylist2 := sudo001.MakeMayList()
+	fmt.Println(maylist2)
+	top := initNode()
+	fmt.Println(top.Next(1, maylist2).Gen(sudo001.MakeMayList()))
 }

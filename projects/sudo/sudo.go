@@ -55,3 +55,29 @@ func (su *sudo)Copy() sudo {
 	}
 	return newSu
 }
+
+func (su *sudo)MakeMayList() maylist {
+	var maylist2 maylist
+	newSu := su.Copy()
+	scan(&newSu)
+	for length := 2; length<9; length++ {
+		for r:=0; r<9; r++{
+			for c:=0; c<9; c++{
+				if len(newSu[r][c].Maybe()) == length {
+					maylist2 = append(maylist2, may{row:r, col:c, may:newSu[r][c].Maybe()})
+				}
+			}
+		}
+	}
+	return maylist2
+}
+
+func (su *sudo)Join(node2 node) sudo {
+	newSu := su.Copy()
+	maylist2 := su.MakeMayList()
+	link := node2.Gen(maylist2)
+	for floor, num := range link {
+		newSu[maylist2[floor].row][maylist2[floor].col].num = num
+	}
+	return newSu
+}

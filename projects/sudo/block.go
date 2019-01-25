@@ -51,7 +51,9 @@ func (b block)GetTup() []byte {
 func lineOk(blist []byte) bool {
 	result := make(map[byte]int)
 	for _, b := range blist {
-		result[b]++
+		if b != '0' {
+			result[b] = 0
+		}
 		if result[b] > 1 {
 			return false
 		}
