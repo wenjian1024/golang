@@ -57,12 +57,13 @@ func (su *sudo)Copy() sudo {
 }
 
 func (su *sudo)MakeMayList() maylist {
+	scan(su)
 	var maylist2 maylist
 	newSu := su.Copy()
 	scan(&newSu)
-	for length := 2; length<9; length++ {
-		for r:=0; r<9; r++{
-			for c:=0; c<9; c++{
+	for length := 2; length < 9; length++ {
+		for r:=0; r < 9; r++ {
+			for c:=0; c < 9; c++ {
 				if len(newSu[r][c].Maybe()) == length {
 					maylist2 = append(maylist2, may{row:r, col:c, may:newSu[r][c].Maybe()})
 				}
@@ -71,13 +72,39 @@ func (su *sudo)MakeMayList() maylist {
 	}
 	return maylist2
 }
-
-func (su *sudo)Join(node2 node) sudo {
-	newSu := su.Copy()
-	maylist2 := su.MakeMayList()
-	link := node2.Gen(maylist2)
-	for floor, num := range link {
-		newSu[maylist2[floor].row][maylist2[floor].col].num = num
+func (m maylist)Gen() func(to int) []int {
+	var seq []int
+	return func(to int) []int {
+		if len(seq) == 0 {
+			seq = append(seq, 0)
+			return seq
+		} else {
+			if to == 1 {
+				if len(seq) == len(m) {
+					for i := range seq {
+						j := len(seq) - i - 1
+						if seq[j] < len(m[j].may) - 1 {
+							seq[j]++
+							seq = seq[:j+1]
+							return seq
+						}
+					}
+				}
+				seq = append(seq, 0)
+				return seq
+			} else {
+				seq = seq[:len(seq)-1]
+				for i := range seq {
+					j := len(seq) - i - 1
+					if seq[j] < len(m[j].may) - 1 {
+						seq[j]++
+						seq = seq[:j+1]
+						return seq
+					}
+				}
+				seq[len(seq)-1]++
+				return seq
+			}
+		}
 	}
-	return newSu
 }

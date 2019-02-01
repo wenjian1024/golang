@@ -1,6 +1,8 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+)
 
 var txt = `008090000
 070000280
@@ -62,10 +64,13 @@ func initNode() node {
 	return node2
 }
 
+
 func main() {
 	sudo001 := makeSudo(txt)
 	maylist2 := sudo001.MakeMayList()
-	fmt.Println(maylist2)
-	top := initNode()
-	fmt.Println(top.Next(1, maylist2).Gen(sudo001.MakeMayList()))
+	temp := maylist2.Gen()
+	for {
+		result := temp(1)
+		fmt.Println(result)
+	}
 }
